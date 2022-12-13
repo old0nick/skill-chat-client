@@ -12,6 +12,7 @@ import org.java_websocket.handshake.ServerHandshake;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Server {
@@ -19,9 +20,9 @@ public class Server {
 
 
     private WebSocketClient client;
-    private Map<Long, String> names = new ConcurrentHashMap<>();
-    private Consumer<Pair<String, String>> onMessageReceived;
-    private Consumer<Pair<String, String>> onPrivateMessage;
+    private final Map<Long, String> names = new ConcurrentHashMap<>();
+    private final Consumer<Pair<String, String>> onMessageReceived;
+    private final Consumer<Pair<String, String>> onPrivateMessage;
 
     public Server(Consumer<Pair<String, String>> onMessageReceived, Consumer<Pair<String, String>> onPrivateMessage) {
         this.onMessageReceived = onMessageReceived;
@@ -29,15 +30,15 @@ public class Server {
     }
 
     public void connect() {
-        URI addr = null;
+        URI address;// = null;
         try {
-            addr = new URI("ws://35.210.129.230:8881");
+            address = new URI("ws://nnbabkov.ru:8881");
         } catch (URISyntaxException e) {
             e.printStackTrace();
             return;
 
         }
-        client = new WebSocketClient(addr) {
+        client = new WebSocketClient(address) {
             @Override
             public void onOpen(ServerHandshake handshakedata) {
                 Log.i("SERVER", "Connected to server");
@@ -78,7 +79,7 @@ public class Server {
         if (text.contains("@")) {
             String name = text.split("@")[0].trim();
             for(Long id : names.keySet()) {
-                if (names.get(id).equals(name)) {
+                if (Objects.requireNonNull(names.get(id)).equals(name)) {
                     receiver = id;
                 }
             }
